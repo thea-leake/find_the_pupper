@@ -1,0 +1,3 @@
+* Find the pupper!
+
+This is a game where you find your lost pupper!  It's being written for the game for the 2020 Autumn Lisp Game Jam.
