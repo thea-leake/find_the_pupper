@@ -66,4 +66,3 @@
 (define init-map (apply vector-immutable
                         (map gen-init-location terrain-map)))
 
-
