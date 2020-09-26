@@ -1,5 +1,11 @@
 #lang racket
 
+(provide init-map
+         get-row
+         (struct-out map-terrain)
+         (struct-out location)
+         (struct-out character))
+
 (require data/collection)
 
 
@@ -37,10 +43,7 @@
                           #f
                           #t))
 (define map-width 16)
-(define map-height 8)
-
-(define block-size 3)
-(define road-spacing (+ 1 block-size))
+(define map-height 12)
 
 (define map-cell-count (* map-width map-height))
 
@@ -66,3 +69,13 @@
 (define init-map (apply vector-immutable
                         (map gen-init-location terrain-map)))
 
+
+(define (get-row current-map row)
+  (subsequence current-map
+               (* (- row 1) map-width)
+               (* row map-width)))
+
+(define (get-column current-map row)
+  (apply vector-immutable
+         (map (lambda (x) (nth current-map (+ row x)))
+              (range map-height))))
