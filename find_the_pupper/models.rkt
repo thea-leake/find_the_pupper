@@ -11,7 +11,7 @@
 
 (struct map-terrain
   (terrain-type
-   player-can-occupy? )
+   enerable? )
   #:transparent
   )
 
@@ -48,7 +48,7 @@
 (define map-cell-count (* map-width map-height))
 
 (define terrain-map
-  '(
+  (list
     road bldg bldg bldg road bldg bldg bldg road bldg bldg bldg road bldg bldg bldg
     road bldg bldg bldg road bldg bldg bldg road bldg bldg bldg road bldg bldg bldg
     road bldg bldg bldg road bldg bldg bldg road bldg bldg bldg road bldg bldg bldg
@@ -90,16 +90,29 @@
 (define (index-column index)
   (remainder index map-width))
 
-(define (same-axis? fn index1 index2)
-  (= (fn index1)
-     (fn index2)))
+(define (same-axis? fn)
+  (lambda (index1 index2)
+    (= (fn index1)
+       (fn index2))))
 
-(define (same-row? index1 index2)
-  (same-axis? index-row index1 index2))
+(define same-row? (same-axis? index-row))
+(define same-column? (same-axis? index-column))
 
-(define (same-column? index1 index2)
-  (same-axis? index-column index1 index2))
 
-(define (horizontal-move-check from to)
-  (and (in-range? to)
-       (same-row? from to)))
+(define (axis-move-check check-fn)
+  (lambda (from to)
+    (and (in-range? to)
+         (check-fn from to))))
+
+(define horizontal-move-check (axis-move-check same-row?))
+(define vertical-move-check (axis-move-check same-column?))
+
+(define (location-occupiable? current-map index)
+  (map-terrain-enerable?
+   (location-terrain
+    (nth current-map index))))
+
+(define (map-axis-check check-fn)
+  (lambda (current-map from to)
+    (and (check-fn from to)
+         (location-occupiable? current-map to))))
