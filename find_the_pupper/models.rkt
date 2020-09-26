@@ -79,3 +79,27 @@
   (apply vector-immutable
          (map (lambda (x) (nth current-map (+ row x)))
               (range map-height))))
+
+(define (in-range? index)
+  (and (< index map-cell-count)
+       (>= index 0)))
+
+(define (index-row index)
+  (quotient index map-width))
+
+(define (index-column index)
+  (remainder index map-width))
+
+(define (same-axis? fn index1 index2)
+  (= (fn index1)
+     (fn index2)))
+
+(define (same-row? index1 index2)
+  (same-axis? index-row index1 index2))
+
+(define (same-column? index1 index2)
+  (same-axis? index-column index1 index2))
+
+(define (horizontal-move-check from to)
+  (and (in-range? to)
+       (same-row? from to)))
