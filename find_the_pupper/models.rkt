@@ -26,6 +26,7 @@
    is-lost-pupper?)
   #:transparent)
 
+
 (define road (map-terrain "road"
                           #t))
 
@@ -112,7 +113,19 @@
    (location-terrain
     (nth current-map index))))
 
+(define (move-1-away from to)
+  (or (= 1
+         (abs (- from to)))
+      (= map-width
+         (abs (- from to)))))
+
 (define (map-axis-check check-fn)
   (lambda (current-map from to)
     (and (check-fn from to)
+         (move-1-away from to)
          (location-occupiable? current-map to))))
+
+(define valid-horizontal-move (map-axis-check horizontal-move-check))
+(define valid-vertical-move (map-axis-check vertical-move-check))
+
+(define (move-left map from to))
