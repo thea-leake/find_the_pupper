@@ -6,7 +6,8 @@
          (struct-out location)
          (struct-out character))
 
-(require data/collection)
+(require data/collection
+         racket/match)
 
 
 (struct map-terrain
@@ -15,7 +16,7 @@
   #:transparent
   )
 
-(struct location ;; probably won't use this
+(struct location
   (terrain
    characters)
   #:transparent)
@@ -31,6 +32,12 @@
    human-location
    pupper-location
    current-player)
+  #:transparent)
+
+(struct turnresponse
+  (gamestate
+   ok?
+   message)
   #:transparent)
 
 (define road (map-terrain "road"
@@ -130,7 +137,8 @@
    (location-terrain
     (nth current-map index))))
 
-(define (move-1-away from to)
+;; depending on what's provided out this will probably be redundant
+(define (move-1-away? from to)
   (or (= 1
          (abs (- from to)))
       (= map-width
@@ -139,10 +147,53 @@
 (define (map-axis-check check-fn)
   (lambda (current-map from to)
     (and (check-fn from to)
-         (move-1-away from to)
+         (move-1-away? from to)
          (location-occupiable? current-map to))))
 
 (define valid-horizontal-move (map-axis-check horizontal-move-check))
 (define valid-vertical-move (map-axis-check vertical-move-check))
 
-;; (define (move-left map from to))
+(define (get-player-location turn)
+  (let ([player (gamestate-current-player turn)])
+    (match player
+      [human  (gamestate-human-location turn)]
+      [pupper (gamestate-pupper-location turn)])))
+
+(define (update-player-location turn to)
+  (let ([player (gamestate-current-player turn)])
+    (match player
+      [human  (struct-copy gamestate turn
+                           [human-location to])]
+      [pupper (struct-copy gamestate turn
+                           [pupper-location to])])))
+
+(define (move-updated turn to)
+  (turnresponse (toggle-player-turn
+                 (update-player-location turn to))
+                #t ""))
+
+(define (move-failed turn)
+  (turnresponse turn
+                #f
+                "Move invalid"))
+
+(define (move-player move-fn turn)
+  (let* ([from (get-player-location turn)]
+         [to (move-fn from)])
+    (cond
+      ((valid-horizontal-move (gamestate-current-map turn)
+                              from
+                              to)
+       (move-updated turn to))
+      (else (move-failed turn)))))
+
+(define (move fn increment)
+  (lambda (turn)
+    (move-player (lambda (from)
+                   (fn from increment))
+                 turn)))
+
+(define move-left (move - 1))
+(define move-right (move + 1))
+(define move-up (move + map-width))
+(define move-down (move + map-width))
