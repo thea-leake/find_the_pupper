@@ -26,6 +26,12 @@
    is-lost-pupper?)
   #:transparent)
 
+(struct gamestate
+  (current-map
+   human-location
+   pupper-location
+   current-player)
+  #:transparent)
 
 (define road (map-terrain "road"
                           #t))
@@ -36,13 +42,15 @@
 (define park (map-terrain "park"
                           #t))
 
-(define player (character "human"
+(define human (character "human"
                           #t
                           #f))
 
 (define pupper (character "pupper"
                           #f
                           #t))
+
+(define player-list (list human pupper))
 (define map-width 16)
 (define map-height 12)
 
@@ -65,11 +73,20 @@
          ))
 
 (define (gen-init-location terrain)
-  (location terrain '[]))
+  (location terrain (set)))
 
 (define init-map (apply vector-immutable
                         (map gen-init-location terrain-map)))
 
+(define (toggle-player player)
+  (if (eq? player human)
+      pupper
+      human))
+
+(define (toggle-player-turn turn)
+  (struct-copy gamestate turn
+               [current-player
+                (toggle-player (gamestate-current-player turn))]))
 
 (define (get-row current-map row)
   (subsequence current-map
@@ -128,4 +145,4 @@
 (define valid-horizontal-move (map-axis-check horizontal-move-check))
 (define valid-vertical-move (map-axis-check vertical-move-check))
 
-(define (move-left map from to))
+;; (define (move-left map from to))
