@@ -1,8 +1,14 @@
 #lang racket/gui
 
-(provide map-image)
+(provide base-map-image
+         update-map)
 
 (require images/compile-time
+         2htdp/image
+         (only-in pict
+                  pict->bitmap)
+         "config.rkt"
+         (prefix-in m: "models.rkt")
          (for-syntax data/collection
                      2htdp/image
                      (only-in pict
@@ -13,6 +19,11 @@
 (begin-for-syntax
   (define (build-cell-image color)
     (square cell-pixel-dim "solid" color))
+
+  (define (build-character-image color)
+    (pict->bitmap (circle (/ cell-pixel-dim 4)
+                          "solid"
+                          color)))
 
 
   (define terrain-pic-mappings
@@ -35,6 +46,44 @@
            (map build-row-image
                 (range 1 (+ 1 map-height)))))
 
-  (define base-map-bitmap (pict->bitmap base-map-image)))
+  (define base-map-bitmap (pict->bitmap base-map-image))
+  (define pupper-bitmap (build-character-image "tan"))
+  (define human-bitmap (build-character-image "purple"))
+  )
 
-(define map-image (compiled-bitmap base-map-bitmap))
+(define base-map-image (compiled-bitmap base-map-bitmap))
+(define pupper-image (compiled-bitmap pupper-bitmap))
+(define human-image (compiled-bitmap human-bitmap))
+
+(define (get-dim-pixel-offset dimension)
+  (lambda (row/colmn)
+   (* cell-pixel-dim
+      (quotient row/colmn dimension))))
+
+(define get-row-offset (get-dim-pixel-offset map-height))
+(define get-column-offset (get-dim-pixel-offset map-width))
+
+(struct coords
+  (row column))
+
+(define (update-map-image map-image character-image row/column)
+  (pict->bitmap
+   (overlay/offset character-image
+                   (get-row-offset (coords-row row/column))
+                   (get-column-offset (coords-column row/column))
+                   map-image)))
+
+
+(define (index->coords index)
+  (coords (m:index-row index)
+          (m:index-column index)))
+
+
+(define (update-map turn)
+  (let* ([pupper-coords (index->coords (gamestate-pupper-location turn))]
+         [human-coords (index->coords (gamestate-pupper-location turn))])
+    (update-map-image (update-map-image base-map-image
+                                        pupper-image
+                                        pupper-coords)
+                      human-image
+                      human-coords)))

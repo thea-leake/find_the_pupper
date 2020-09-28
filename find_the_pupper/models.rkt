@@ -3,6 +3,8 @@
 (provide init-map
          get-row
          get-column
+         index-row
+         index-column
          move-left
          move-right
          move-up
