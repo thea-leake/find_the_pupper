@@ -17,10 +17,7 @@
 
 
 (define (start)
-  (println (channel-try-get current-turn-channel))
-  (println "updating channel")
   (channel-put current-turn-channel init-turn)
-  (println "updated channel")
   )
 
 

@@ -57,21 +57,27 @@
 
 (define (get-dim-pixel-offset dimension)
   (lambda (row/colmn)
-   (* cell-pixel-dim
-      (quotient row/colmn dimension))))
+    (* cell-pixel-dim
+       (remainder row/colmn dimension))
+    ))
 
 (define get-row-offset (get-dim-pixel-offset map-height))
 (define get-column-offset (get-dim-pixel-offset map-width))
 
 (struct coords
-  (row column))
+  (row column)
+  #:transparent)
 
 (define (update-map-image map-image character-image row/column)
-  (pict->bitmap
-   (overlay/offset character-image
-                   (get-row-offset (coords-row row/column))
-                   (get-column-offset (coords-column row/column))
-                   map-image)))
+  (let ([x-offset (get-column-offset (coords-column row/column))]
+        [y-offset (get-row-offset (coords-row row/column))])
+    (displayln x-offset)
+    (displayln y-offset)
+    (pict->bitmap
+     (underlay/xy map-image
+                 x-offset
+                 y-offset
+                 character-image))))
 
 
 (define (index->coords index)
@@ -81,7 +87,7 @@
 
 (define (update-map turn)
   (let* ([pupper-coords (index->coords (gamestate-pupper-location turn))]
-         [human-coords (index->coords (gamestate-pupper-location turn))])
+         [human-coords (index->coords (gamestate-human-location turn))])
     (update-map-image (update-map-image base-map-image
                                         pupper-image
                                         pupper-coords)
