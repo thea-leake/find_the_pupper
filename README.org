@@ -4,3 +4,6 @@
   Depending on time I may come back to this and complete later though
 
   The premise is your pupper is lost, and you now must find it.
+
+** Licenses
+ - All code is licensed under the [[https://www.apache.org/licenses/LICENSE-2.0][Apache 2.0]]  license.
