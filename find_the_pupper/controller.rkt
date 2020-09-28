@@ -17,8 +17,7 @@
 
 
 (define (start)
-  (channel-put current-turn-channel init-turn)
-  )
+  (channel-put current-turn-channel init-turn))
 
 
 (define (start-controller)

@@ -1,3 +1,6 @@
 * Find the pupper!
+  This is a game written for the 2020 Autumn Lisp Game Jam.
+  Unfortunately it was not finished in time for entry.
+  Depending on time I may come back to this and complete later though
 
-This is a game where you find your lost pupper!  It's being written for the game for the 2020 Autumn Lisp Game Jam.
+  The premise is your pupper is lost, and you now must find it.
