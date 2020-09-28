@@ -110,8 +110,8 @@
 (define (valid-move current-map from to)
   (and (or (horizontal-move-check from to)
            (vertical-move-check from to))
-   (move-1-away? from to)
-   (location-occupiable? current-map to)))
+       (move-1-away? from to)
+       (location-occupiable? current-map to)))
 
 
 (define (get-player-location turn)

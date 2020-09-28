@@ -63,7 +63,7 @@
   (define base-map-bitmap (pict->bitmap base-map-image))
   (define pupper-bitmap (build-character-image "tan"))
   (define human-bitmap (build-character-image "purple"))
-  )
+)
 
 (define base-map-image (compiled-bitmap base-map-bitmap))
 (define pupper-image (compiled-bitmap pupper-bitmap))
@@ -85,8 +85,6 @@
 (define (update-map-image map-image character-image row/column)
   (let ([x-offset (get-column-offset (coords-column row/column))]
         [y-offset (get-row-offset (coords-row row/column))])
-    (displayln x-offset)
-    (displayln y-offset)
     (pict->bitmap
      (underlay/xy map-image
                  x-offset
